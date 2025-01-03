@@ -17,6 +17,7 @@ export function getHotels({ startDate, endDate, cityId, person }: HotelsProps) {
 export function useHotels({ startDate, endDate, cityId, person }: HotelsProps) {
   const { data, isError, isLoading, refetch } = useQuery({
     queryKey: ["hotel", startDate, cityId, endDate, person],
+    enabled: startDate !== "" && endDate !== "" && cityId !== "",
     queryFn: () => getHotels({ startDate, endDate, cityId, person }),
   });
 

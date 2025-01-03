@@ -49,9 +49,8 @@ export function DateAndTimePicker({
     onClose();
   };
 
-  const getUnixTimestamp = (date: Date) => {
-    const adjustedDate = new Date(date);
-    return adjustedDate.getTime();
+  const getUnixTimestamp = (date: Date): number => {
+    return date.getTime();
   };
 
   const validateTimes = () => {
@@ -76,6 +75,7 @@ export function DateAndTimePicker({
 
   useEffect(() => {
     validateTimes();
+    // eslint-disable-next-line
   }, [startDate, endDate]);
 
   const isButtonDisabled = timeError || !startDate;

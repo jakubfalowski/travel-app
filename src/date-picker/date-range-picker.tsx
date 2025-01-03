@@ -68,14 +68,15 @@ export function DateRangePicker({
   const formatDate = (date: Date) => {
     const day = date.getDate();
     const month = `${date
-      .toLocaleString("en-US", { month: "short" })
+      .toLocaleString("pl", { month: "long" })
       .toLowerCase()}`;
 
     return `${day} ${month}`;
   };
 
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+  const tommorow = new Date();
+  tommorow.setDate(tommorow.getDate() + 1);
+  tommorow.setHours(0, 0, 0, 0);
 
   return (
     <div className="w-full">
@@ -85,14 +86,14 @@ export function DateRangePicker({
           handleDateChange(value as Date | [Date, Date] | null)
         }
         value={dateRange || undefined}
-        minDate={today}
+        minDate={tommorow}
         tileClassName={({ date }) => {
-          if (date < today) {
+          if (date < tommorow) {
             return "disabled-day";
           }
 
-          if (date.toDateString() === today.toDateString()) {
-            return "today-tile";
+          if (date.toDateString() === tommorow.toDateString()) {
+            return "tommorow-tile";
           }
 
           if (dateRange) {
@@ -117,12 +118,12 @@ export function DateRangePicker({
           dateRange[0]?.toLocaleDateString() ===
           dateRange[1]?.toLocaleDateString() ? (
             <div className="flex justify-between font-bold">
-              <p>eventDate: </p>
+              <p>Data: </p>
               <p>{formatDate(dateRange[0])}</p>
             </div>
           ) : (
             <div className="flex justify-between font-bold">
-              <p>eventDate: </p>
+              <p>Data: </p>
               <p>{`${formatDate(dateRange[0])} - ${formatDate(
                 dateRange[1]
               )}`}</p>

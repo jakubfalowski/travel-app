@@ -30,6 +30,11 @@ export function useFlights({
 }: FlightProps) {
   const { data, isError, isLoading, refetch } = useQuery({
     queryKey: ["flight", startDate, startAirport, endAirport, endDate, person],
+    enabled:
+      startDate !== "" &&
+      endDate !== "" &&
+      startAirport !== "" &&
+      endDate !== "",
     queryFn: () =>
       getFlights({ startDate, endDate, startAirport, endAirport, person }),
   });
