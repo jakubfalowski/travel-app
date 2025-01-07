@@ -17,7 +17,7 @@ export function getFlights({
   person,
 }: FlightProps) {
   return client(
-    `flights/searchFlights?fromId=${startAirport}&toId=${endAirport}&departDate=${startDate}&returnDate=${endDate}&pageNo=1&adults=${person}&sort=BEST&cabinClass=ECONOMY&currency_code=PLN`
+    `https://booking-com15.p.rapidapi.com/api/v1/flights/searchFlights?fromId=${startAirport}&toId=${endAirport}&departDate=${startDate}&returnDate=${endDate}&pageNo=1&adults=${person}&sort=BEST&cabinClass=ECONOMY&currency_code=PLN`
   );
 }
 

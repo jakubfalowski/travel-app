@@ -65,7 +65,10 @@ const ChooseOptionPage = () => {
           endDateTime={endDateTime}
         />
       </FormControl>
+      <br />
       <button onClick={() => setStep(2)}>dalej</button>
+      <br />
+      <button onClick={() => setStep(4)}>Porównaj oferty</button>
     </div>
   );
 };

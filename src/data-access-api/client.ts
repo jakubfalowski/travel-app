@@ -14,7 +14,6 @@ async function client(
     ...customConfig
   }: ClientOptions = {}
 ) {
-  const fullEndpoint = `https://booking-com15.p.rapidapi.com/api/v1/${endpoint}`;
   const headers: Record<string, string> = {};
 
   headers["x-rapidapi-host"] = "booking-com15.p.rapidapi.com";
@@ -34,7 +33,7 @@ async function client(
     ...customConfig,
   };
 
-  const response = await window.fetch(fullEndpoint, config);
+  const response = await window.fetch(endpoint, config);
 
   const data = await response.json().catch(() => null);
   if (response.ok) {

@@ -10,7 +10,7 @@ type HotelsProps = {
 
 export function getHotels({ startDate, endDate, cityId, person }: HotelsProps) {
   return client(
-    `hotels/searchHotels?dest_id=${cityId}&search_type=CITY&arrival_date=${startDate}&departure_date=${endDate}&adults=${person}&room_qty=1&page_number=1&units=metric&temperature_unit=c&languagecode=pl&currency_code=PLN`
+    `https://booking-com15.p.rapidapi.com/api/v1/hotels/searchHotels?dest_id=${cityId}&search_type=CITY&arrival_date=${startDate}&departure_date=${endDate}&adults=${person}&room_qty=1&page_number=1&units=metric&temperature_unit=c&languagecode=pl&currency_code=PLN`
   );
 }
 

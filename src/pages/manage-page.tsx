@@ -10,6 +10,7 @@ import {
 } from "../utils/converted-types.tsx";
 import { getCityById } from "../utils/functions.ts";
 import { SelectHotelOffers } from "./select-hotel-offers.tsx";
+import { CompareOffers } from "./compare-offers.tsx";
 
 export function ManagePage() {
   const {
@@ -93,12 +94,8 @@ export function ManagePage() {
       setConvertedHotelsData(tempConvertedHotelsData);
   }, [tempConvertedHotelsData, setConvertedHotelsData]);
 
-  const storedData = localStorage.getItem("compareObjects")
-    ? JSON.parse(localStorage.getItem("compareObjects") || "")
-    : [];
-  console.log(storedData);
-
   if (step === 1) return <ChooseOptionPage />;
   if (step === 2) return <SelectFlightOffers />;
   if (step === 3) return <SelectHotelOffers />;
+  if (step === 4) return <CompareOffers />;
 }

@@ -1,11 +1,13 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { useTravelContext } from "./context.tsx";
 import {
   ConvertedFlightData,
   ConvertedHotelData,
 } from "../utils/converted-types.tsx";
 import {
+  calculateAverages,
   calculateTimeDifference,
+  filterDates,
   generateRandomString,
   getCityById,
 } from "../utils/functions.ts";
@@ -15,6 +17,8 @@ import "leaflet/dist/leaflet.css";
 import { LatLngExpression } from "leaflet";
 import L from "leaflet";
 import "../index.css";
+import { useWeather } from "../data-access-api/weather.ts";
+import { formatDateTime } from "../date-picker/functions.tsx";
 
 export function SelectHotelOffers() {
   const {
@@ -29,7 +33,80 @@ export function SelectHotelOffers() {
     convertedFlightsData,
   } = useTravelContext();
 
+  const departureTimes = useMemo(
+    () => ({
+      start: startDateTime || "",
+      end: endDateTime || "",
+    }),
+    [startDateTime, endDateTime]
+  );
+
+  const validDates = useMemo(() => {
+    const today = new Date();
+    const futureDate = new Date();
+    futureDate.setDate(today.getDate() + 14);
+    const startDate = formatDateTime(today);
+    const endDate = formatDateTime(futureDate);
+    return filterDates(departureTimes, startDate, endDate);
+  }, [departureTimes]);
+
   const icon = L.icon({ iconUrl: "/marker.png" });
+
+  const newHotelData =
+    (convertedHotelsData as ConvertedHotelData[]).find(
+      (hotel) => hotel.id === activeHotelId
+    ) || [];
+
+  const newFlightData =
+    (convertedFlightsData as ConvertedFlightData[]).find(
+      (flight) => flight.id === activeFlightId
+    ) || [];
+
+  const { data: weatherData } = useWeather({
+    city: (newHotelData as unknown as { cityName: string }).cityName || "",
+  });
+
+  const filteredWeatherData = (weatherData?.forecast?.forecastday || []).filter(
+    (forecast) => validDates.includes(forecast?.date || "")
+  );
+  function handlePushData() {
+    const storedData = localStorage.getItem("compareObjects")
+      ? JSON.parse(localStorage.getItem("compareObjects") || "")
+      : [];
+
+    const weather = calculateAverages(filteredWeatherData);
+
+    const newData = [
+      {
+        hotelData: newHotelData,
+        flightData: newFlightData,
+        totalCost: Number(
+          (
+            Number((newHotelData as ConvertedHotelData).price) +
+            Number((newFlightData as ConvertedFlightData).price)
+          ).toFixed(2)
+        ),
+        travelTime: Number(
+          calculateTimeDifference(
+            (newFlightData as ConvertedFlightData)
+              .arrivalTime1 as unknown as string,
+            (newFlightData as ConvertedFlightData)
+              .arrivalTime2 as unknown as string
+          )
+        ),
+        avgTemperature: weather.avgMaxTempC,
+        avgWind: weather.avgMaxWindKph,
+        avgChanceOfRain: weather.avgChanceOfRain,
+        avgChanceOfSnow: weather.avgChanceOfSnow,
+        key: generateRandomString(8),
+      },
+    ];
+
+    storedData.push(...newData);
+
+    localStorage.setItem("compareObjects", JSON.stringify(storedData));
+  }
+
   return (
     <div>
       <div className="bg-slate-200 text-lg text-center p-4">
@@ -40,44 +117,8 @@ export function SelectHotelOffers() {
         <p>{getCityById(endCityId)?.name}</p>
         <button
           onClick={() => {
-            const storedData = localStorage.getItem("compareObjects")
-              ? JSON.parse(localStorage.getItem("compareObjects") || "")
-              : [];
-
-            const newHotelData =
-              (convertedHotelsData as ConvertedHotelData[]).find(
-                (hotel) => hotel.id === activeHotelId
-              ) || [];
-
-            const newFlightData =
-              (convertedFlightsData as ConvertedFlightData[]).find(
-                (flight) => flight.id === activeFlightId
-              ) || [];
-            const newData = [
-              {
-                hotelData: newHotelData,
-                flightData: newFlightData,
-                totalCost: Number(
-                  (
-                    Number((newHotelData as ConvertedHotelData).price) +
-                    Number((newFlightData as ConvertedFlightData).price)
-                  ).toFixed(2)
-                ),
-                travelTime: Number(
-                  calculateTimeDifference(
-                    (newFlightData as ConvertedFlightData)
-                      .arrivalTime1 as unknown as string,
-                    (newFlightData as ConvertedFlightData)
-                      .arrivalTime2 as unknown as string
-                  )
-                ),
-                key: generateRandomString(8),
-              },
-            ];
-
-            storedData.push(...newData);
-
-            localStorage.setItem("compareObjects", JSON.stringify(storedData));
+            handlePushData();
+            setStep(4);
           }}
         >
           zatwierdź tą ofertę do porównania
@@ -97,7 +138,8 @@ export function SelectHotelOffers() {
                 onClick={() => setActiveHotelId(hotelData.id)}
               >
                 <div className="bg-amber-100 p-4 font-medium">
-                  <p>{hotelData.name}</p>
+                  <p className="text-2xl">{hotelData.name}</p>
+                  <p>{hotelData.description}</p>
                   <p>Cena: {Number(hotelData.price).toFixed(2)}</p>
                   {activeHotelId === hotelData.id && <p>Wybrana opcja</p>}
                 </div>
