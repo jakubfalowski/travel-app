@@ -11,3 +11,51 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
 }
+
+.main-page {
+  background-image: url("../public/mainPage.png");
+  height: 100dvh;
+  background-position: center bottom;
+  background-repeat: no-repeat;
+}
+
+.choose-place {
+  background-image: url("../public/choosePlace.png");
+  height: 100dvh;
+  background-position: center center;
+  background-repeat: no-repeat;
+}
+
+.choose-date {
+  background-image: url("../public/chooseDate.png");
+  height: 100dvh;
+  background-position: center center;
+  background-repeat: no-repeat;
+}
+
+.font-header {
+  font-family: "Teko", serif;
+  font-optical-sizing: auto;
+  font-weight: 600;
+  font-style: normal;
+  color: white;
+  font-size: 70px;
+}
+
+.font-description {
+  font-family: "Alkatra", serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+  font-size: 28px;
+  color: white;
+}
+
+.font-title {
+  font-family: "Teko", serif;
+  font-optical-sizing: auto;
+  font-weight: 500;
+  font-style: normal;
+  color: #81a969;
+  font-size: 34px;
+}

@@ -40,8 +40,8 @@ export const TravelContext = createContext<TravelContextType | null>(null);
 
 export const TravelContextProvider = () => {
   const [step, setStep] = useState(1);
-  const [startCityId, setStartCityId] = useState<string>("0");
-  const [endCityId, setEndCityId] = useState<string>("0");
+  const [startCityId, setStartCityId] = useState<string>("1");
+  const [endCityId, setEndCityId] = useState<string>("2");
   const [startDateTime, setStartDateTime] = useState<string | null>(null);
   const [endDateTime, setEndDateTime] = useState<string | null>(null);
   const [convertedFlightsData, setConvertedFlightsData] = useState<

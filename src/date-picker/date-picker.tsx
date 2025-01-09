@@ -2,10 +2,11 @@ import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { formatDateTime } from "./functions.tsx";
 import React from "react";
 import DateRangePicker from "./date-range-picker.tsx";
+import { twMerge } from "tailwind-merge";
 
 type DateAndTimePickerProps = {
   isVisible: boolean;
-  onClose: () => void;
+  onSave: () => void;
   setStartDateTime: Dispatch<SetStateAction<string | null>>;
   startDateTime: string | null;
   setEndDateTime: Dispatch<SetStateAction<string | null>>;
@@ -14,7 +15,7 @@ type DateAndTimePickerProps = {
 
 export function DateAndTimePicker({
   isVisible,
-  onClose,
+  onSave,
   setStartDateTime,
   setEndDateTime,
   startDateTime,
@@ -36,9 +37,7 @@ export function DateAndTimePicker({
 
   const handleSave = () => {
     const formattedStartDateTime = startDate ? formatDateTime(startDate) : null;
-
     let formattedEndDateTime = endDate ? formatDateTime(endDate) : null;
-
     if (!formattedEndDateTime && startDate) {
       formattedEndDateTime = formatDateTime(startDate);
     }
@@ -46,7 +45,7 @@ export function DateAndTimePicker({
     setStartDateTime(formattedStartDateTime);
     if (formattedEndDateTime) setEndDateTime(formattedEndDateTime);
 
-    onClose();
+    onSave();
   };
 
   const getUnixTimestamp = (date: Date): number => {
@@ -87,10 +86,9 @@ export function DateAndTimePicker({
       <div className="relative flex flex-col items-center bg-white max-w-[380px] w-full px-2 py-5 rounded-lg shadow-lg z-10">
         <div className="flex justify-between w-full">
           <p>Kalendarz</p>
-          <button onClick={onClose}>X</button>
         </div>
 
-        <div className="flex justify-center mt-6 w-full">
+        <div className="flex justify-center mt-3 w-full">
           <DateRangePicker
             onDateChange={handleDateChange}
             defaultStartDate={startDateTime ? new Date(startDateTime) : null}
@@ -104,13 +102,16 @@ export function DateAndTimePicker({
           <p className="text-red-500 text-sm">Niepoprawny format daty</p>
         )}
 
-        <div className="flex justify-end w-full mt-6">
+        <div className="flex justify-end w-full">
           <button
-            className="h-12 px-6 rounded-lg"
+            className={twMerge(
+              "h-12 px-6 rounded-lg mt-4 text-white",
+              isButtonDisabled ? "bg-zinc-400" : "bg-[#ff008c]"
+            )}
             onClick={handleSave}
             disabled={isButtonDisabled}
           >
-            zapisz
+            Wyszukaj
           </button>
         </div>
       </div>
