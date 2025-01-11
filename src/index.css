@@ -59,3 +59,8 @@ code {
   color: #81a969;
   font-size: 34px;
 }
+
+.offers-bg {
+  background-image: url("../public/chooseOffersBg.png");
+  background-size: cover;
+}

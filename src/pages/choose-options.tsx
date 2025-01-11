@@ -30,6 +30,10 @@ const ChooseOptionPage = () => {
     });
   }, [mainPageStep]);
 
+  const storedData = localStorage.getItem("compareObjects")
+    ? JSON.parse(localStorage.getItem("compareObjects") || "")
+    : [];
+
   return (
     <>
       <div className="main-page px-28 py-20">
@@ -44,6 +48,27 @@ const ChooseOptionPage = () => {
               system wybierze najlepszą opcję spośród najbardziej dla Ciebie
               atrakcyjnych
             </p>
+            <div className="flex justify-around gap-3">
+              <button
+                className={twMerge(
+                  "h-12 px-6 rounded-lg mt-4 text-white",
+                  storedData.length === 0 ? "bg-gray-700" : "bg-[#ff008c]"
+                )}
+                onClick={() => setStep(4)}
+                disabled={storedData.length === 0}
+              >
+                Porównaj obecne oferty ({storedData.length})
+              </button>
+              <button
+                className={twMerge(
+                  "h-12 px-6 rounded-lg mt-4 text-white bg-[#ff008c]"
+                )}
+                onClick={() => setMainPageStep(1)}
+              >
+                Znajdź nową oferte
+              </button>
+            </div>
+
             <button
               className="m-5 flex justify-center items-center w-full"
               onClick={() => {

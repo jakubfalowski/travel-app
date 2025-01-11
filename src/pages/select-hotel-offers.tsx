@@ -108,20 +108,21 @@ export function SelectHotelOffers() {
   }
 
   return (
-    <div>
-      <div className="bg-slate-200 text-lg text-center p-4">
-        <p>Wybrana przez Ciebie opcja:</p>
-        <p>
+    <div className="offers-bg">
+      <div className="text-lg text-center p-4">
+        <p className="font-description my-3" style={{ color: "#ffcc16" }}>
           {startDateTime} - {endDateTime}
         </p>
-        <p>{getCityById(endCityId)?.name}</p>
+        <p className="font-header my-8">{getCityById(endCityId)?.name}</p>
         <button
           onClick={() => {
             handlePushData();
             setStep(4);
           }}
+          className="font-description border-2 border-white p-3 rounded-lg"
+          style={{ color: "#ffcc16" }}
         >
-          zatwierdź tą ofertę do porównania
+          Zatwierdź oferty
         </button>
       </div>
       <div className="mx-16 my-4">
@@ -133,27 +134,57 @@ export function SelectHotelOffers() {
                 key={hotelData.id}
                 className={twMerge(
                   "border-x-gray-950 border-4 mb-2 w-full",
-                  activeHotelId === hotelData.id && "border-x-green-300"
+                  activeHotelId === hotelData.id &&
+                    "border-green-300 border-x-green-300 border-8"
                 )}
                 onClick={() => setActiveHotelId(hotelData.id)}
               >
-                <div className="bg-amber-100 p-4 font-medium">
-                  <p className="text-2xl">{hotelData.name}</p>
-                  <p>{hotelData.description}</p>
-                  <p>Cena: {Number(hotelData.price).toFixed(2)}</p>
-                  {activeHotelId === hotelData.id && <p>Wybrana opcja</p>}
+                <div className="bg-[#0E3EFC] p-4 font-medium">
+                  <p className="font-description">{hotelData.name}</p>
+                  <p className="font-description" style={{ fontSize: "14px" }}>
+                    {hotelData.description}
+                  </p>
+                  {activeHotelId === hotelData.id && (
+                    <p className="font-description">Wybrana opcja</p>
+                  )}
                 </div>
 
-                <div className="flex gap-4 bg-amber-50 p-4 max-h-80">
+                <div className="flex gap-4 bg-[#182FB4] p-4 max-h-80">
                   <div className="w-full">
                     <img
                       src={(hotelData.imageUrl as unknown as string) || ""}
                       alt={(hotelData?.name as unknown as string) || ""}
+                      className="max-h-72"
                     />
                   </div>
-                  <div className="w-full">
-                    <p>Ocena: {hotelData?.reviewScore}</p>
-                    <p>Ilość ocen: {hotelData?.reviewCount}</p>
+                  <div className="w-full font-description">
+                    <p>
+                      Cena:{" "}
+                      <span
+                        className="font-header"
+                        style={{ fontSize: "32px" }}
+                      >
+                        {Number(hotelData.price).toFixed(2)} zł
+                      </span>
+                    </p>
+                    <p>
+                      Ocena:{" "}
+                      <span
+                        className="font-header"
+                        style={{ fontSize: "32px" }}
+                      >
+                        {hotelData?.reviewScore}
+                      </span>
+                    </p>
+                    <p>
+                      Ilość ocen:{" "}
+                      <span
+                        className="font-header"
+                        style={{ fontSize: "32px" }}
+                      >
+                        {hotelData?.reviewCount}
+                      </span>
+                    </p>
                   </div>
                   <div className="w-full overflow-hidden">
                     <MapContainer
