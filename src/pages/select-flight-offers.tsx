@@ -17,7 +17,12 @@ export function SelectFlightOffers() {
   } = useTravelContext();
 
   return (
-    <div className="offers-bg">
+    <div
+      className={twMerge(
+        "bg-[#10249B]",
+        convertedFlightsData ? "" : "h-screen"
+      )}
+    >
       <div className="text-lg text-center p-4">
         <p className="font-description my-3" style={{ color: "#ffcc16" }}>
           {startDateTime} - {endDateTime}
@@ -25,13 +30,17 @@ export function SelectFlightOffers() {
         <p className="font-header my-8">
           {getCityById(startCityId)?.name} - {getCityById(endCityId)?.name}
         </p>
-        <button
-          onClick={() => setStep(3)}
-          className="font-description border-2 border-white p-3 rounded-lg"
-          style={{ color: "#ffcc16" }}
-        >
-          Przejdź dalej
-        </button>
+        {convertedFlightsData ? (
+          <button
+            onClick={() => setStep(3)}
+            className="font-description border-2 border-white p-3 rounded-lg"
+            style={{ color: "#ffcc16" }}
+          >
+            Przejdź dalej
+          </button>
+        ) : (
+          <p className="font-description">Trwa pobieranie danych...</p>
+        )}
       </div>
       <div className="mx-16 my-4">
         {convertedFlightsData &&

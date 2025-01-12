@@ -1,4 +1,4 @@
-import { FormControl, InputLabel, MenuItem, Select } from "@mui/material";
+import { FormControl } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { CITIES } from "../utils/variables.ts";
 import DateAndTimePicker from "../date-picker/date-picker.tsx";
@@ -52,10 +52,10 @@ const ChooseOptionPage = () => {
               <button
                 className={twMerge(
                   "h-12 px-6 rounded-lg mt-4 text-white",
-                  storedData.length === 0 ? "bg-gray-700" : "bg-[#ff008c]"
+                  storedData.length < 2 ? "bg-gray-700" : "bg-[#ff008c]"
                 )}
                 onClick={() => setStep(4)}
-                disabled={storedData.length === 0}
+                disabled={storedData.length < 2}
               >
                 Porównaj obecne oferty ({storedData.length})
               </button>

@@ -76,7 +76,7 @@ export const CITIES = [
     hotel_id: "-372490",
     flight_id: "BCN.AIRPORT",
     name: "Barcelona",
-    image: "barceona.jpg",
+    image: "barcelona.jpg",
     description:
       "Barcelona to miasto wspaniałych plaż, nowoczesnej architektury Gaudiego i dynamicznego życia miejskiego. Warto zobaczyć Sagrada Familia, Park Güell oraz spacerować po La Rambla.",
   },

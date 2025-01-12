@@ -113,3 +113,27 @@ export const calculateAverages = (forecastData: Forecast[]): Averages => {
     avgChanceOfSnow: total.daily_chance_of_snow / numberOfDays,
   };
 };
+
+const cityTranslations = {
+  Kraków: "Krakow",
+  Warszawa: "Warsaw",
+  Wrocław: "Wroclaw",
+  Rzym: "Rome",
+  Paryż: "Paris",
+  Londyn: "London",
+  Berlin: "Berlin",
+  Madryt: "Madrid",
+  Barcelona: "Barcelona",
+  Stambuł: "Istanbul",
+  Porto: "Porto",
+  Larnaka: "Larnaca",
+  Ateny: "Athens",
+  Split: "Split",
+  Tirana: "Tirana",
+  Wiedeń: "Vienna",
+  Budapeszt: "Budapest",
+};
+
+export function getTranslatedCity(city: string) {
+  return cityTranslations[city] || city;
+}

@@ -10,6 +10,7 @@ import {
   filterDates,
   generateRandomString,
   getCityById,
+  getTranslatedCity,
 } from "../utils/functions.ts";
 import { twMerge } from "tailwind-merge";
 import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
@@ -63,17 +64,21 @@ export function SelectHotelOffers() {
     ) || [];
 
   const { data: weatherData } = useWeather({
-    city: (newHotelData as unknown as { cityName: string }).cityName || "",
+    city:
+      getTranslatedCity(
+        (newHotelData as unknown as { cityName: string }).cityName
+      ) || "",
   });
 
   const filteredWeatherData = (weatherData?.forecast?.forecastday || []).filter(
     (forecast) => validDates.includes(forecast?.date || "")
   );
-  function handlePushData() {
-    const storedData = localStorage.getItem("compareObjects")
-      ? JSON.parse(localStorage.getItem("compareObjects") || "")
-      : [];
 
+  const storedData = localStorage.getItem("compareObjects")
+    ? JSON.parse(localStorage.getItem("compareObjects") || "")
+    : [];
+
+  function handlePushData() {
     const weather = calculateAverages(filteredWeatherData);
 
     const newData = [
@@ -108,7 +113,7 @@ export function SelectHotelOffers() {
   }
 
   return (
-    <div className="offers-bg">
+    <div className="bg-[#10249B]">
       <div className="text-lg text-center p-4">
         <p className="font-description my-3" style={{ color: "#ffcc16" }}>
           {startDateTime} - {endDateTime}
@@ -117,7 +122,8 @@ export function SelectHotelOffers() {
         <button
           onClick={() => {
             handlePushData();
-            setStep(4);
+            if (storedData.length > 0) setStep(4);
+            else setStep(1);
           }}
           className="font-description border-2 border-white p-3 rounded-lg"
           style={{ color: "#ffcc16" }}

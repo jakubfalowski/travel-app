@@ -1,31 +1,147 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { formatDateAndHour } from "../utils/functions.ts";
 import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L, { LatLngExpression } from "leaflet";
+import OpenAI from "openai";
+import { useTravelContext } from "./context.tsx";
+
+const openai = new OpenAI({
+  apiKey: process.env.REACT_APP_OPENAI_API_KEY,
+  dangerouslyAllowBrowser: true,
+});
 
 export function CompareOffers() {
-  const storedData = localStorage.getItem("compareObjects")
-    ? JSON.parse(localStorage.getItem("compareObjects") || "")
-    : [];
+  const [storedData, setStoredData] = useState(() => {
+    const data = localStorage.getItem("compareObjects");
+    return data ? JSON.parse(data) : [];
+  });
+  const { setStep } = useTravelContext();
+
   const icon = L.icon({ iconUrl: "/marker.png" });
+
+  function removeItemByKey(keyToRemove) {
+    const updatedData = storedData.filter((item) => item.key !== keyToRemove);
+    localStorage.setItem("compareObjects", JSON.stringify(updatedData));
+    setStoredData(updatedData);
+  }
+
+  const [gptChoice, setGptChoice] = useState<string>("");
+  const fetchGPT = async () => {
+    const offers = storedData
+      .map((data, i: number) => {
+        const cityName = data.hotelData.cityName;
+        const totalCost = (data.totalCost || 0).toFixed(2);
+        const reviewScore = (data.hotelData.reviewScore || 0).toFixed(2);
+        const reviewCount = (data.hotelData.reviewCount || 0).toFixed(2);
+        const baggagePrice =
+          Number(data.flightData.baggagePrice) > 0
+            ? data.flightData.baggagePrice.toFixed(2)
+            : 0;
+        const travelTime = data.travelTime;
+        const avgTemperature = (data.avgTemperature || 0).toFixed(2);
+        const avgWind = (data.avgWind || 0).toFixed(2);
+        const avgChanceOfRain = (data.avgChanceOfRain || -1).toFixed(2);
+        const avgChanceOfSnow = (data.avgChanceOfSnow || -1).toFixed(2);
+        const flightDuration1 = (() => {
+          const seconds = Number(data?.flightData.flightDuration1);
+          const hours = Math.floor(seconds / 3600);
+          const minutes = Math.floor((seconds % 3600) / 60);
+          return `${hours}:${minutes < 10 ? "0" : ""}${minutes}`;
+        })();
+        const flightDuration2 = (() => {
+          const seconds = Number(data?.flightData.flightDuration2);
+          const hours = Math.floor(seconds / 3600);
+          const minutes = Math.floor((seconds % 3600) / 60);
+          return `${hours}:${minutes < 10 ? "0" : ""}${minutes}`;
+        })();
+
+        return `'Oferta nr ${i + 1} to:
+      Miasto: ${cityName}, 
+      Cena: ${totalCost} zł, 
+      Cena bagażu: ${baggagePrice} zł, 
+      Dni w podróży: ${travelTime}, 
+      Ocena hotelu: ${reviewScore},
+      Ilość ocen: ${reviewCount},
+      Uśredniona temperatura: ${
+        avgTemperature !== 0 ? avgTemperature : "brak info ile"
+      } C, 
+      Uśredniony wiatr: ${avgWind !== 0 ? avgWind : "brak info ile"} km/h, 
+      Uśredniona szansa na deszcz: ${
+        avgChanceOfRain > -1 ? avgChanceOfRain : "brak info ile"
+      }%, 
+      Uśredniona szansa na śnieg: ${
+        avgChanceOfSnow > -1 ? avgChanceOfSnow : "brak info ile"
+      }%, 
+      Czas przelotów: ${flightDuration1}, ${flightDuration2}.'`;
+      })
+      .join(";\n");
+
+    try {
+      const completion = await openai.chat.completions.create({
+        model: "gpt-4o-mini",
+        messages: [
+          {
+            role: "system",
+            content:
+              "Szukamy miejsca na wakacje bądź podróż by pozwiedzać. Jeżeli główną atrakcją tego miasta jest morze to oferta jest fatalna jeśli nie ma bardzo dużej temperatury i jeśli będzie dużo padało. I wtedy nie możesz tego proponować, zamiast tego zaproponuj miejsce gdzie są atrakcje zabytkowe. Jeśli nie ma dostępu do morza to priorytetem jest przede wszystkim atrakcyjność miasta pod względem zabytków. Oprócz tego ważna jest niska cena i wysoka jakość hotelu. Weź pod uwagę także długość lotu, żeby nie była skrajnie wysoka i żeby prędkość wiatru była mała",
+          },
+          {
+            role: "user",
+            content: `Wybierz jedno z tych miejsc na wakacje i uzasadnij dlaczego w maksymalnie 2 zdaniach: "${offers}"`,
+          },
+        ],
+      });
+      setGptChoice(completion.choices[0].message.content || "");
+    } catch (error) {
+      console.error("Error fetching GPT response:", error);
+    }
+  };
+
+  useEffect(() => {
+    if (storedData.length > 0) fetchGPT();
+  }, [storedData]);
+
+  console.log(storedData);
+
   return (
-    <div className="offers-bg">
+    <div className="bg-[#10249B] pb-8">
       <div className="flex flex-col items-center py-4">
-        <p className="font-header">Nasza podpowiedź</p>
-        <p className="font-description">Wybierz opcje nr 1 bo ...</p>
+        <div className="flex justify-between font-header w-full px-16">
+          <button onClick={() => setStep(1)}>&lt;-</button>
+          <p>Nasza podpowiedź</p>
+          <p></p>
+        </div>
+        <p className="font-description mx-60" style={{ fontSize: "16px" }}>
+          {gptChoice}
+        </p>
       </div>
-      {storedData.map((data) => {
+      {storedData.map((data, i: number) => {
         const position = [data.hotelData.latitude, data.hotelData.longitude];
         return (
           <div
             key={data.key}
-            className="mb-4 bg-[#162BA3] font-description border-4 border-black mx-16 rounded-lg"
+            className="mt-4 bg-[#162BA3] font-description border-4 border-black mx-16 rounded-lg"
             style={{ fontSize: "16px" }}
           >
-            <p style={{ fontSize: "24px" }} className="mx-8 py-2">
-              {data.hotelData.cityName}
-            </p>
+            <div
+              style={{ fontSize: "24px" }}
+              className="mx-8 py-2 flex justify-between"
+            >
+              <p>
+                {i + 1}. {data.hotelData.cityName}
+              </p>
+              {storedData.length > 2 && (
+                <button
+                  onClick={() => {
+                    removeItemByKey(data.key);
+                  }}
+                >
+                  X
+                </button>
+              )}
+            </div>
+
             <div className="flex gap-3 justify-between mx-8 pb-1">
               <div>
                 <p>Cena: {(data.totalCost || 0).toFixed(2)} zł</p>
@@ -45,19 +161,28 @@ export function CompareOffers() {
               <div>
                 <p>
                   Uśredniona dzienna temperatura:{" "}
-                  {(data.avgTemperature || 0).toFixed(2)} C
+                  {data.avgTemperature > 0
+                    ? data.avgTemperature.toFixed(2)
+                    : "-"}{" "}
+                  C
                 </p>
                 <p>
-                  Uśredniony dzienny wiatr: {(data.avgWind || 0).toFixed(2)}{" "}
-                  km/h
+                  Uśredniony dzienny wiatr:{" "}
+                  {data.avgWind > 0 ? data.avgWind.toFixed(2) : "-"} km/h
                 </p>
                 <p>
                   Uśredniona dzienna szansa na deszcz:{" "}
-                  {(data.avgChanceOfRain || 0).toFixed(2)}%
+                  {!data.avgTemperature
+                    ? "-"
+                    : (data.avgChanceOfRain || 0).toFixed(2)}
+                  %
                 </p>
                 <p>
                   Uśredniona dzienna szansa na śnieg:{" "}
-                  {(data.avgChanceOfSnow || 0).toFixed(2)}%
+                  {!data.avgTemperature
+                    ? "-"
+                    : (data.avgChanceOfSnow || 0).toFixed(2)}
+                  %
                 </p>
               </div>
             </div>
@@ -70,21 +195,24 @@ export function CompareOffers() {
                   className="max-h-72"
                 />
               </div>
-              <div className="w-full font-description">
+              <div
+                className="w-full font-description"
+                style={{ fontSize: "20px" }}
+              >
                 <p>
-                  Cena:{" "}
+                  Cena hotelu:{" "}
                   <span className="font-header" style={{ fontSize: "32px" }}>
                     {Number(data?.hotelData.price).toFixed(2)} zł
                   </span>
                 </p>
                 <p>
-                  Ocena:{" "}
+                  Ocena hotelu:{" "}
                   <span className="font-header" style={{ fontSize: "32px" }}>
                     {data?.hotelData?.reviewScore}
                   </span>
                 </p>
                 <p>
-                  Ilość ocen:{" "}
+                  Ilość ocen hotelu:{" "}
                   <span className="font-header" style={{ fontSize: "32px" }}>
                     {data?.hotelData?.reviewCount}
                   </span>
@@ -94,7 +222,7 @@ export function CompareOffers() {
                 <MapContainer
                   center={position as unknown as LatLngExpression}
                   zoom={13}
-                  scrollWheelZoom={false}
+                  scrollWheelZoom={true}
                   style={{
                     height: "100vh",
                     transform: "translateY(-33.33%)",
