@@ -71,7 +71,7 @@ export function CompareOffers() {
         avgChanceOfRain > -1 ? avgChanceOfRain : "brak info ile"
       }%, 
       Uśredniona szansa na śnieg: ${
-        avgChanceOfSnow > -1 ? avgChanceOfSnow : "brak info ile"
+        avgChanceOfSnow > -1 ? avgChanceOfSnow : "brak informacji"
       }%, 
       Czas przelotów: ${flightDuration1}, ${flightDuration2}.'`;
       })
@@ -79,12 +79,12 @@ export function CompareOffers() {
 
     try {
       const completion = await openai.chat.completions.create({
-        model: "gpt-4o-mini",
+        model: "gpt-3.5-turbo",
         messages: [
           {
             role: "system",
             content:
-              "Szukamy miejsca na wakacje bądź podróż by pozwiedzać. Jeżeli główną atrakcją tego miasta jest morze to oferta jest fatalna jeśli nie ma bardzo dużej temperatury i jeśli będzie dużo padało. I wtedy nie możesz tego proponować, zamiast tego zaproponuj miejsce gdzie są atrakcje zabytkowe. Jeśli nie ma dostępu do morza to priorytetem jest przede wszystkim atrakcyjność miasta pod względem zabytków. Oprócz tego ważna jest niska cena i wysoka jakość hotelu. Weź pod uwagę także długość lotu, żeby nie była skrajnie wysoka i żeby prędkość wiatru była mała",
+              "Poszukiwane jest miejsce na wakacje bądź podróż by pozwiedzać. Jeżeli główną atrakcją tego miasta jest dostęp do morza to ustal bardzo duży priorytet na wysoką temperaturę i niski procent opadów. W przypadkach, gdzie jakość pogody jest podobna wybieraj miejsca posiadające więcej zabytków turystycznych. Jeśli destynacja nie ma dostępu do morza to priorytetem jest przede wszystkim atrakcyjność miasta pod względem zabytków. Oprócz tego ważna jest niska cena i wysoka jakość hotelu. Weź pod uwagę także długość lotu, żeby nie była skrajnie wysoka i preferuj niską prędkość wiatru",
           },
           {
             role: "user",
@@ -201,19 +201,19 @@ export function CompareOffers() {
               >
                 <p>
                   Cena hotelu:{" "}
-                  <span className="font-header" style={{ fontSize: "32px" }}>
+                  <span className="font-header" style={{ fontSize: "20px" }}>
                     {Number(data?.hotelData.price).toFixed(2)} zł
                   </span>
                 </p>
                 <p>
                   Ocena hotelu:{" "}
-                  <span className="font-header" style={{ fontSize: "32px" }}>
+                  <span className="font-header" style={{ fontSize: "20px" }}>
                     {data?.hotelData?.reviewScore}
                   </span>
                 </p>
                 <p>
                   Ilość ocen hotelu:{" "}
-                  <span className="font-header" style={{ fontSize: "32px" }}>
+                  <span className="font-header" style={{ fontSize: "20px" }}>
                     {data?.hotelData?.reviewCount}
                   </span>
                 </p>
